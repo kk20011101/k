@@ -1,33 +1,46 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.ndimage import measurements
+import networkx as nx
 
-def percolation_simulation(p, size, num_simulations):
-    results = []
+def create_lattice(n):
+    """
+    Create an n x n square lattice graph
+    """
+    G = nx.grid_2d_graph(n, n)
+    pos = dict((n, n) for n in G.nodes())
+    return G, pos
 
-    for _ in range(num_simulations):
-        # Create a random grid where each site is open with probability p
-        grid = np.random.rand(size, size) < p
+def bond_percolation(G, p):
+    """
+    Perform bond percolation on graph G with bond probability p
+    """
+    H = G.copy()
+    for edge in G.edges():
+        if np.random.rand() > p:
+            H.remove_edge(*edge)
+    return H
 
-        # Label the clusters
-        lw, num = measurements.label(grid)
+def plot_lattice(G, pos, title):
+    """
+    Plot the lattice graph G with given positions pos
+    """
+    plt.figure(figsize=(8, 8))
+    nx.draw(G, pos, with_labels=False, node_size=10, node_color='black', edge_color='blue')
+    plt.title(title)
+    plt.show()
 
-        # Find the labels of the clusters that percolate (span from top to bottom)
-        perc_labels = np.intersect1d(lw[0, :], lw[-1, :])
+# Parameters
+n = 20  # size of the lattice
+p = 0.5  # bond probability
 
-        # Check if any cluster percolates
-        percolates = len(perc_labels[perc_labels > 0]) > 0
-        results.append(percolates)
+# Create lattice
+G, pos = create_lattice(n)
 
-    # Calculate the probability of percolation
-    percolation_probability = np.mean(results)
-    return percolation_probability, results
+# Perform bond percolation
+H = bond_percolation(G, p)
 
-# Example usage
-p = 0.5927
-size = 100
-num_simulations = 1
+# Plot original lattice
+plot_lattice(G, pos, "Original Lattice")
 
-percolation_probability, results = percolation_simulation(p, size, num_simulations)
-
-print(f"Percolation probability: {percolation_probability}")
+# Plot percolated lattice
+plot_lattice(H, pos, "Percolated Lattice (p = {:.2f})".format(p))
