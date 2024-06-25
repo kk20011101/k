@@ -1,0 +1,41 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import networkx as nx
+
+def create_lattice(size):
+    """Create a 2D square lattice of given size."""
+    lattice = nx.grid_2d_graph(size, size)
+    return lattice
+
+def bond_percolation(lattice, p):
+    """Perform bond percolation on the lattice with probability p."""
+    for edge in lattice.edges():
+        if np.random.rand() > p:
+            lattice.remove_edge(*edge)
+    return lattice
+
+def plot_lattice(lattice, title="Bond Percolation"):
+    """Plot the lattice with its percolation clusters."""
+    pos = {n: n for n in lattice.nodes()}
+    clusters = list(nx.connected_components(lattice))
+    colors = [plt.cm.jet(i / len(clusters)) for i in range(len(clusters))]
+
+    plt.figure(figsize=(8, 8))
+    for cluster, color in zip(clusters, colors):
+        subgraph = lattice.subgraph(cluster)
+        nx.draw(subgraph, pos, node_size=10, edge_color=[color]*len(subgraph.edges()), 
+                node_color=[color]*len(subgraph.nodes()), with_labels=False)
+    
+    plt.title(title)
+    plt.show()
+
+# Parameters
+size = 20  # Size of the lattice (size x size)
+p = 0.4    # Probability of an edge being present
+
+# Create lattice and perform bond percolation
+lattice = create_lattice(size)
+percolated_lattice = bond_percolation(lattice, p)
+
+# Plot the result
+plot_lattice(percolated_lattice, f"Bond Percolation (p={p})")
