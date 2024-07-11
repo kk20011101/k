@@ -1,0 +1,36 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def generate_percolation_grid(size, p):
+    """
+    Generates a percolation grid of given size with occupation probability p.
+    
+    Parameters:
+    size (int): The size of the grid (size x size).
+    p (float): The probability of a site being occupied.
+    
+    Returns:
+    numpy.ndarray: The generated percolation grid.
+    """
+    grid = np.random.rand(size, size) < p
+    return grid
+
+def plot_grid(grid):
+    """
+    Plots the percolation grid.
+    
+    Parameters:
+    grid (numpy.ndarray): The percolation grid to plot.
+    """
+    plt.figure(figsize=(6, 6))
+    plt.imshow(grid, cmap='binary', interpolation='none')
+    plt.title('Site Percolation Grid')
+    plt.show()
+
+# Example usage
+size = 20  # Size of the grid (20x20)
+p = 0.5    # Probability of a site being occupied
+
+# Generate and plot the percolation grid
+percolation_grid = generate_percolation_grid(size, p)
+plot_grid(percolation_grid)
